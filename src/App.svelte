@@ -2,14 +2,31 @@
   import svelteLogo from './assets/svelte.svg'
   import viteLogo from '/vite.svg'
   import Counter from './lib/Counter.svelte'
+  import Boids from './lib/Boids.svelte';
+  import TicketCard from './lib/TicketCard.svelte'
 
+ const customColors = [
+    'rgba(0, 255, 136, 0.4)',   // primary
+    'rgba(0, 255, 136, 0.4)',   // primary
+    'rgba(139, 92, 246, 0.4)',   // accent
+    'rgba(229, 229, 229, 0.3)',  // white
+  ];
   function redirect(obj) {
     var goTo= obj.getAttribute
   }
+  let isHovered = false;
   var location = 'https://forms.gle/HZbQd3WQsqmzTByAA'
 </script>
 
 <main>
+    <Boids 
+    numBoids={500}
+    numBoidsMobile={40}
+    opacity={0.7}
+    colors={customColors}
+    avoidanceSelector=".boid-repel"
+    avoidanceBuffer={50}
+    />
   <div id='background'></div>
       <div class="url-display mono">
         <span on:click={()=>window.location=location} id="url-text">~ Creative Catalyst Tech Talks ~</span>
@@ -22,10 +39,10 @@
         <a href="#contact" class="nav-item">contact</a>
     </nav>
     <section id="home" class="header">
-        <h1 class="title">make~</h1>
+        <h1 class="title" class:boid-repel={isHovered} on:mouseover={() => isHovered = true} on:mouseout={() => isHovered = false} >make~</h1>
         <p class="subtitle">creative tech flash talks in southampton</p>
-        <p class="subtitle"> 23rd September 2025 6-8pm</p>
-        <p class="subtitle">Register Your Interest</p>
+        <TicketCard/>
+       
     </section>
 
     <section id="about" class="section">
@@ -69,7 +86,7 @@
     <section id="speak" class="section">
         <div class="content">
             <h2>Want to Speak?</h2>
-            <p>We'd love that. You can talk about something you made, something you're making, or just something you think. We're especially excited by first-time speakers, non-coders, weird formats, and strange metaphors.</p>
+            <p>We'd love that. You can talk about something you made, something you're making, or just something you think. We're especially excited by first-time speakers,  weird formats, and strange metaphors.</p>
             <p><strong>Date:</strong> September 23rd, 2025<br>
             <strong>Location:</strong> Network Eagle Labs, Southampton<br>
             <strong>Time:</strong> Doors at 6:00PM. Talks 6:30–8:00.</p>
@@ -85,24 +102,10 @@
             <a> Damian Bemben | Organiser | damianbemben@geochip.uk</a>
         </div>
     </section>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </main>
 
+<style>
+      .class-on-hover {
+    color: red;
+  }
+</style>
