@@ -1,6 +1,6 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
-  
+
   // Props
   export let numBoids = 80;
   export let numBoidsMobile = 40;
@@ -13,28 +13,31 @@
   ];
   export let avoidanceSelector = '.boid-repel';
   export let avoidanceBuffer = 0.5;
-  
+
   let canvas;
   let animationId;
   let boids = [];
-  
+  let frameCount = 0;
+
   class Boid {
     constructor(x, y, canvasEl) {
       this.pos = { x, y };
       this.vel = {
-        x: (Math.random() - 0.5) * 0.5,
-        y: (Math.random() - 0.5) * 0.5
+        x: (Math.random() - 0.5) * 1.2,
+        y: (Math.random() - 0.5) * 1.2
       };
       this.acc = { x: 0, y: 0 };
-      this.maxSpeed = 0.8;
-      this.maxForce = 0.02;
-      this.perception = 80;
+      this.maxSpeed = 1.0;
+      this.maxForce = 0.018;
+      this.perception = 70;
       this.canvas = canvasEl;
       this.trail = [];
-      this.maxTrailLength = 3;
+      this.maxTrailLength = 18;
       this.color = this.getRandomColor();
-      this.size = 1;
-      this.glowSize = 4;
+      this.size = 0.4;
+      // Per-boid noise offset for organic wandering
+      this.noiseOffset = Math.random() * 1000;
+      this.noiseSpeed = 0.0006 + Math.random() * 0.0004;
     }
 
     getRandomColor() {
@@ -52,41 +55,48 @@
     avoidElements() {
       const elements = document.querySelectorAll(avoidanceSelector);
       let avoidForce = { x: 0, y: 0 };
-      
+
       elements.forEach(element => {
         const rect = element.getBoundingClientRect();
-        
-        // Check if boid is near/inside element bounds with small buffer
+
         const buffer = avoidanceBuffer;
-        if (this.pos.x > rect.left - buffer && 
+        if (this.pos.x > rect.left - buffer &&
             this.pos.x < rect.right + buffer &&
-            this.pos.y > rect.top - buffer && 
+            this.pos.y > rect.top - buffer &&
             this.pos.y < rect.bottom + buffer) {
-          
-          // Calculate gentle deflection based on closest edge
+
           const distLeft = this.pos.x - rect.left;
           const distRight = rect.right - this.pos.x;
           const distTop = this.pos.y - rect.top;
           const distBottom = rect.bottom - this.pos.y;
-          
-          // Find minimum distance to edge
+
           const minDist = Math.min(distLeft, distRight, distTop, distBottom);
-          
-          // Apply gentle force away from closest edge
+
           if (minDist === distLeft) avoidForce.x -= 1;
           else if (minDist === distRight) avoidForce.x += 1;
           else if (minDist === distTop) avoidForce.y -= 1;
           else if (minDist === distBottom) avoidForce.y += 1;
         }
       });
-      
+
       return this.limit(avoidForce, this.maxForce);
+    }
+
+    // Noise-based wandering using overlapping sine waves
+    wander(frame) {
+      const t = frame * this.noiseSpeed + this.noiseOffset;
+      const angle = Math.sin(t) * Math.PI * 2
+                  + Math.cos(t * 0.73) * Math.PI;
+      return {
+        x: Math.cos(angle) * this.maxForce * 0.4,
+        y: Math.sin(angle) * this.maxForce * 0.4
+      };
     }
 
     align(boidsList) {
       let steering = { x: 0, y: 0 };
       let total = 0;
-      
+
       for (let other of boidsList) {
         let d = this.distance(this.pos, other.pos);
         if (other !== this && d < this.perception) {
@@ -95,7 +105,7 @@
           total++;
         }
       }
-      
+
       if (total > 0) {
         steering.x /= total;
         steering.y /= total;
@@ -114,7 +124,7 @@
     cohesion(boidsList) {
       let steering = { x: 0, y: 0 };
       let total = 0;
-      
+
       for (let other of boidsList) {
         let d = this.distance(this.pos, other.pos);
         if (other !== this && d < this.perception) {
@@ -123,7 +133,7 @@
           total++;
         }
       }
-      
+
       if (total > 0) {
         steering.x /= total;
         steering.y /= total;
@@ -144,7 +154,7 @@
     separation(boidsList) {
       let steering = { x: 0, y: 0 };
       let total = 0;
-      
+
       for (let other of boidsList) {
         let d = this.distance(this.pos, other.pos);
         if (other !== this && d < 40) {
@@ -161,7 +171,7 @@
           total++;
         }
       }
-      
+
       if (total > 0) {
         steering.x /= total;
         steering.y /= total;
@@ -177,62 +187,75 @@
       return steering;
     }
 
-    flock(boidsList) {
+    flock(boidsList, frame) {
       let alignment = this.align(boidsList);
       let cohesion = this.cohesion(boidsList);
       let separation = this.separation(boidsList);
       let avoidance = this.avoidElements();
-      
-      // Weight the forces
-      alignment.x *= 1.5;
-      alignment.y *= 1.5;
-      cohesion.x *= 0.8;
-      cohesion.y *= 0.8;
-      separation.x *= 1.2;
-      separation.y *= 1.2;
+      let wander = this.wander(frame);
+
+      alignment.x *= 1.2;
+      alignment.y *= 1.2;
+      cohesion.x *= 0.6;
+      cohesion.y *= 0.6;
+      separation.x *= 1.4;
+      separation.y *= 1.4;
       avoidance.x *= 1.0;
       avoidance.y *= 1.0;
-      
-      this.acc.x += alignment.x + cohesion.x + separation.x + avoidance.x;
-      this.acc.y += alignment.y + cohesion.y + separation.y + avoidance.y;
+
+      this.acc.x += alignment.x + cohesion.x + separation.x + avoidance.x + wander.x;
+      this.acc.y += alignment.y + cohesion.y + separation.y + avoidance.y + wander.y;
     }
 
     update() {
-      // Update velocity and position
       this.vel.x += this.acc.x;
       this.vel.y += this.acc.y;
       this.vel = this.limit(this.vel, this.maxSpeed);
-      
+
       this.pos.x += this.vel.x;
       this.pos.y += this.vel.y;
-      
-      // Update trail (very short)
+
       this.trail.push({ x: this.pos.x, y: this.pos.y });
-      if (this.trail.length > 3) {
+      if (this.trail.length > this.maxTrailLength) {
         this.trail.shift();
       }
-      
-      // Reset acceleration
+
       this.acc.x = 0;
       this.acc.y = 0;
     }
 
     draw(ctx) {
-      // Draw very subtle trail
+      if (this.trail.length < 2) return;
 
-      // Draw boid dot
-      ctx.globalAlpha = 0.6;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      // Draw trail as tapering, fading line segments
+      for (let i = 1; i < this.trail.length; i++) {
+        const a = this.trail[i - 1];
+        const b = this.trail[i];
+        // Skip segment if the boid wrapped around the canvas edge
+        const dx = Math.abs(b.x - a.x);
+        const dy = Math.abs(b.y - a.y);
+        if (dx > 100 || dy > 100) continue;
+
+        const t = i / this.trail.length; // 0 = tail, 1 = head
+        ctx.globalAlpha = t * t * 0.75;
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = t * 0.9 + 0.1;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+      }
+
+      // Bright head dot
+      ctx.globalAlpha = 0.9;
       ctx.fillStyle = this.color;
       ctx.beginPath();
       ctx.arc(this.pos.x, this.pos.y, this.size, 0, Math.PI * 2);
       ctx.fill();
-      
-      // Draw subtle glow
-      ctx.globalAlpha = 0.1;
-      ctx.beginPath();
-      ctx.arc(this.pos.x, this.pos.y, this.glowSize, 0, Math.PI * 2);
-      ctx.fill();
-      
+
       ctx.globalAlpha = 1;
     }
 
@@ -253,13 +276,13 @@
       return vector;
     }
   }
-  
+
   function resizeCanvas() {
     if (!canvas) return;
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
   }
-  
+
   function initBoids() {
     if (!canvas) return;
     boids = [];
@@ -272,40 +295,45 @@
       ));
     }
   }
-  
+
   function animate() {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    
-    // Clear completely each frame
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
+
+    // Screen blending makes overlapping trails glow luminously
+    ctx.globalCompositeOperation = 'screen';
+
+    frameCount++;
+
     for (let boid of boids) {
       boid.edges();
-      boid.flock(boids);
+      boid.flock(boids, frameCount);
       boid.update();
       boid.draw(ctx);
     }
-    
+
+    ctx.globalCompositeOperation = 'source-over';
+
     animationId = requestAnimationFrame(animate);
   }
-  
+
   onMount(() => {
     resizeCanvas();
     initBoids();
     animate();
-    
-    // Add resize listener
+
     window.addEventListener('resize', handleResize);
   });
-  
+
   onDestroy(() => {
     if (animationId) {
       cancelAnimationFrame(animationId);
     }
     window.removeEventListener('resize', handleResize);
   });
-  
+
   function handleResize() {
     resizeCanvas();
     initBoids();

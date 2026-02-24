@@ -1,18 +1,18 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
 
-  export let eventTitle = "Early Bird Ticket";
-  export let eventDate = "September 23rd, 2025";
-  export let eventTime = "5:30 - 8:00 PM";
-  export let eventDateTime = "2025-09-23T17:30:00"; // ISO format for countdown
-  export let venue = "Network Eagle Labs";
+  export let eventTitle = "Southern Creative Catalyst | MAKE";
+  export let eventDate = "10 March 2026";
+  export let eventTime = "5:30 PM – 8:00 PM";
+  export let eventDateTime = "2026-03-10T17:30:00"; // ISO format for countdown
+  export let venue = "Network Eagle Lab";
     let countdown = { days: 0, hours: 0, minutes: 0, seconds: 0 };
   let interval;
 
   export let location = "Southampton";
   export let format = "6 × 6min talks";
   export let price = "Free";
-  export let eventbriteUrl = "https://www.eventbrite.co.uk/e/rsa-creative-catalyst-make-tickets-1567351664019?aff=oddtdtcreator";
+  export let eventbriteUrl = "https://www.eventbrite.co.uk/e/southern-creative-catalyst-make-tickets-1982672360402";
   export let perks = [
     "6 creative tech flash talks",
     "Networking with local makers & creatives", 
@@ -130,12 +130,12 @@
   :global(:root) {
     --primary: #00ff88;
     --secondary: #ff6b35;
-    --accent: #4ecdc4;
+    --accent: #8b5cf6;
     --bg: #0a0a0a;
-    --text: #ffffff;
-    --text-dim: #cccccc;
-    --card-bg: rgba(255, 255, 255, 0.05);
-    --border: rgba(255, 255, 255, 0.1);
+    --text: #f0f0f0;
+    --text-dim: #a3a3a3;
+    --card-bg: rgba(255, 255, 255, 0.04);
+    --border: rgba(255, 255, 255, 0.08);
   }
 
   .ticket-section {
@@ -147,23 +147,25 @@
   }
 
   .ticket-card {
-    background: var(--card-bg);
+    background: rgba(10, 10, 10, 0.7);
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: 20px;
     padding: 2rem;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     position: relative;
     overflow: hidden;
-    max-width: 500px;
+    max-width: 480px;
     width: 100%;
-    transition: all 0.3s ease;
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    font-family: 'JetBrains Mono', 'Monaco', 'Menlo', monospace;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
   }
 
   .ticket-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(0, 255, 136, 0.1);
-    border-color: var(--primary);
+    transform: translateY(-4px);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 255, 136, 0.15);
+    border-color: rgba(0, 255, 136, 0.25);
   }
 
   .ticket-card::before {
@@ -172,8 +174,16 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--primary), var(--accent), transparent);
+  }
+
+  .ticket-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(0, 255, 136, 0.05) 0%, transparent 60%);
+    pointer-events: none;
   }
 
   .ticket-header {
@@ -182,15 +192,20 @@
   }
 
   .ticket-title {
-    font-size: 1.25rem;
+    font-size: 1rem;
     color: var(--primary);
-    margin-bottom: 0.5rem;
-    font-weight: 600;
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
   }
 
   .ticket-date {
-    font-size: 0.9rem;
-    color: var(--text-dim);
+    font-size: 1.5rem;
+    color: var(--text);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    font-family: 'Inter', sans-serif;
   }
 
   .ticket-details {
@@ -237,81 +252,50 @@
 
   .eventbrite-btn {
     width: 100%;
-    padding: 1rem 2rem;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
-    color: var(--bg);
+    padding: 0.9rem 2rem;
+    background: var(--primary);
+    color: #0a0a0a;
     border: none;
-    border-radius: 12px;
+    border-radius: 10px;
     font-family: inherit;
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: 0.9rem;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
+    transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
     text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  .eventbrite-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, var(--secondary), var(--primary));
-    transition: left 0.3s ease;
-    z-index: -1;
-  }
-
-  .eventbrite-btn:hover::before {
-    left: 0;
+    letter-spacing: 1.5px;
   }
 
   .eventbrite-btn:hover {
+    opacity: 0.9;
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(0, 255, 136, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 255, 136, 0.35);
   }
+
+  .eventbrite-btn:active {
+    transform: translateY(0);
+  }
+
   .directions-btn {
     width: 100%;
-    padding: 0.875rem 2rem;
+    padding: 0.8rem 2rem;
     background: transparent;
-    color: var(--accent);
-    border: 1px solid var(--accent);
-    border-radius: 12px;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    border-radius: 10px;
     font-family: inherit;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .directions-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: var(--accent);
-    transition: left 0.3s ease;
-    z-index: -1;
-  }
-
-  .directions-btn:hover::before {
-    left: 0;
+    transition: all 0.2s ease;
+    margin-top: 0.75rem;
+    letter-spacing: 0.5px;
   }
 
   .directions-btn:hover {
-    color: var(--bg);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(78, 205, 196, 0.3);
+    color: var(--text);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
   }
 
   .ticket-perks {
@@ -391,31 +375,26 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 0.5rem;
-    min-width: 50px;
-    transition: all 0.3s ease;
-  }
-
-  .countdown-item:hover {
-    border-color: var(--primary);
-    background: rgba(0, 255, 136, 0.05);
+    background: rgba(0, 255, 136, 0.04);
+    border: 1px solid rgba(0, 255, 136, 0.12);
+    border-radius: 10px;
+    padding: 0.6rem 0.5rem;
+    min-width: 54px;
   }
 
   .countdown-number {
-    font-size: 1.25rem;
-    font-weight: 600;
+    font-size: 1.4rem;
+    font-weight: 700;
     color: var(--primary);
     line-height: 1;
+    font-variant-numeric: tabular-nums;
   }
 
   .countdown-label {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: var(--text-dim);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-top: 0.25rem;
+    letter-spacing: 1px;
+    margin-top: 0.3rem;
   }
 </style>
