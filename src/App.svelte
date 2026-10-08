@@ -205,9 +205,7 @@
         <div class="content">
             <h2>Want to Speak?</h2>
             <p>We'd love that. You can talk about something you made, something you're making, or just something you can't stop thinking about. We're especially excited by first-time speakers, weird formats, and strange metaphors.</p>
-            <p><strong>Date:</strong> 10 March 2026<br>
-            <strong>Location:</strong> Network Eagle Lab, Portland Terrace, Southampton<br>
-            <strong>Time:</strong> Doors at 5:30 PM. Talks from 6:00 PM.</p>
+
             <div style="margin-top: 2rem;">
                 <a href="{location}" class="interactive-text" style="color: var(--primary); text-decoration: none; font-weight: 600;">→ Apply to speak here</a>
             </div>

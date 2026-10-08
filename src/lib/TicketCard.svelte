@@ -1,27 +1,27 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
 
-  export let eventTitle = "Southern Creative Catalyst | MAKE";
-  export let eventDate = "9th June 2026";
+  export let eventTitle = "MAKE~";
+  export let eventDate = "Thurs 26th Novemberc 2026";
   export let eventTime = "5:30 PM – 8:00 PM";
   export let eventDateTime = "2026-06-09T17:30:00"; // ISO format for countdown
-  export let venue = "South Downs Social";
+  export let venue = "To Be Announced (Southampton/Winchester)";
     let countdown = { days: 0, hours: 0, minutes: 0, seconds: 0 };
   /**
      * @type {number | undefined}
      */
   let interval;
 
-  export let location = "Winchester";
+  export let location = "To Be Announced";
   export let format = "6 × 6min talks";
   export let price = "Free";
-  export let eventbriteUrl = "https://www.eventbrite.co.uk/e/rsa-challenge-southern-creative-catalyst-make-in-winchester-tickets-1986306030808";
+  export let eventbriteUrl = "https://luma.com/qyimx88z";
   export let perks = [
     "6 creative tech flash talks",
     "Networking with local makers & creatives", 
     "Light refreshments & drinks",
   ];
-  let mapsUrl = "https://maps.app.goo.gl/61onrWrCbRcHP1Pi8";
+  let mapsUrl = "";
     function updateCountdown() {
     const now = new Date().getTime();
     const eventTime = new Date(eventDateTime).getTime();
