@@ -4,7 +4,7 @@
   export let eventTitle = "MAKE~";
   export let eventDate = "Thurs 26th Novemberc 2026";
   export let eventTime = "5:30 PM – 8:00 PM";
-  export let eventDateTime = "2026-06-09T17:30:00"; // ISO format for countdown
+  export let eventDateTime = "2026-11-26T17:30:00"; // ISO format for countdown
   export let venue = "To Be Announced (Southampton/Winchester)";
     let countdown = { days: 0, hours: 0, minutes: 0, seconds: 0 };
   /**
