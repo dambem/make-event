@@ -18,6 +18,10 @@
   let animationId;
   let boids = [];
   let frameCount = 0;
+  let mouse = null;
+  let repelRects = [];
+  const cellSize = 70; // matches perception
+  const mouseRadius = 220;
 
   class Boid {
     constructor(x, y, canvasEl) {
@@ -34,7 +38,7 @@
       this.trail = [];
       this.maxTrailLength = 18;
       this.color = this.getRandomColor();
-      this.size = 0.4;
+      this.size = 0.9;
       // Per-boid noise offset for organic wandering
       this.noiseOffset = Math.random() * 1000;
       this.noiseSpeed = 0.0006 + Math.random() * 0.0004;
@@ -53,12 +57,9 @@
     }
 
     avoidElements() {
-      const elements = document.querySelectorAll(avoidanceSelector);
       let avoidForce = { x: 0, y: 0 };
 
-      elements.forEach(element => {
-        const rect = element.getBoundingClientRect();
-
+      repelRects.forEach(rect => {
         const buffer = avoidanceBuffer;
         if (this.pos.x > rect.left - buffer &&
             this.pos.x < rect.right + buffer &&
@@ -187,12 +188,29 @@
       return steering;
     }
 
+    // Push nearby boids away from the cursor, harder the closer they are
+    repelFromMouse() {
+      if (!mouse) return { x: 0, y: 0 };
+      const dx = this.pos.x - mouse.x;
+      const dy = this.pos.y - mouse.y;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      if (d > mouseRadius || d < 1) return { x: 0, y: 0 };
+
+      const falloff = 1 - d / mouseRadius;
+      const strength = this.maxForce * 4 * falloff;
+      return {
+        x: (dx / d) * strength,
+        y: (dy / d) * strength
+      };
+    }
+
     flock(boidsList, frame) {
       let alignment = this.align(boidsList);
       let cohesion = this.cohesion(boidsList);
       let separation = this.separation(boidsList);
       let avoidance = this.avoidElements();
       let wander = this.wander(frame);
+      let mouseForce = this.repelFromMouse();
 
       alignment.x *= 1.2;
       alignment.y *= 1.2;
@@ -203,8 +221,8 @@
       avoidance.x *= 1.0;
       avoidance.y *= 1.0;
 
-      this.acc.x += alignment.x + cohesion.x + separation.x + avoidance.x + wander.x;
-      this.acc.y += alignment.y + cohesion.y + separation.y + avoidance.y + wander.y;
+      this.acc.x += alignment.x + cohesion.x + separation.x + avoidance.x + wander.x + mouseForce.x;
+      this.acc.y += alignment.y + cohesion.y + separation.y + avoidance.y + wander.y + mouseForce.y;
     }
 
     update() {
@@ -230,27 +248,33 @@
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
 
-      // Draw trail as tapering, fading line segments
-      for (let i = 1; i < this.trail.length; i++) {
-        const a = this.trail[i - 1];
-        const b = this.trail[i];
-        // Skip segment if the boid wrapped around the canvas edge
-        const dx = Math.abs(b.x - a.x);
-        const dy = Math.abs(b.y - a.y);
-        if (dx > 100 || dy > 100) continue;
-
-        const t = i / this.trail.length; // 0 = tail, 1 = head
-        ctx.globalAlpha = t * t * 0.75;
+      // Draw the trail as a few tapering, fading polylines (cheaper than one stroke per point)
+      const n = this.trail.length;
+      const bands = 4;
+      for (let k = 0; k < bands; k++) {
+        const start = Math.floor((k * (n - 1)) / bands);
+        const end = Math.floor(((k + 1) * (n - 1)) / bands);
+        const t = (k + 1) / bands;
+        ctx.globalAlpha = Math.min(1, t * t * 1.2);
         ctx.strokeStyle = this.color;
-        ctx.lineWidth = t * 0.9 + 0.1;
+        ctx.lineWidth = t * 1.4 + 0.2;
         ctx.beginPath();
-        ctx.moveTo(a.x, a.y);
-        ctx.lineTo(b.x, b.y);
+        ctx.moveTo(this.trail[start].x, this.trail[start].y);
+        for (let i = start + 1; i <= end; i++) {
+          const a = this.trail[i - 1];
+          const b = this.trail[i];
+          // Break the line if the boid wrapped around the canvas edge
+          if (Math.abs(b.x - a.x) > 100 || Math.abs(b.y - a.y) > 100) {
+            ctx.moveTo(b.x, b.y);
+          } else {
+            ctx.lineTo(b.x, b.y);
+          }
+        }
         ctx.stroke();
       }
 
       // Bright head dot
-      ctx.globalAlpha = 0.9;
+      ctx.globalAlpha = 1;
       ctx.fillStyle = this.color;
       ctx.beginPath();
       ctx.arc(this.pos.x, this.pos.y, this.size, 0, Math.PI * 2);
@@ -307,9 +331,30 @@
 
     frameCount++;
 
+    // Read layout once per frame instead of once per boid
+    repelRects = Array.from(document.querySelectorAll(avoidanceSelector))
+      .map(el => el.getBoundingClientRect());
+
+    // Spatial hash so each boid only checks nearby boids, not all of them
+    const grid = new Map();
+    for (let boid of boids) {
+      const key = Math.floor(boid.pos.x / cellSize) + ',' + Math.floor(boid.pos.y / cellSize);
+      const cell = grid.get(key);
+      if (cell) cell.push(boid); else grid.set(key, [boid]);
+    }
+
     for (let boid of boids) {
       boid.edges();
-      boid.flock(boids, frameCount);
+      const cx = Math.floor(boid.pos.x / cellSize);
+      const cy = Math.floor(boid.pos.y / cellSize);
+      const neighbours = [];
+      for (let gx = cx - 1; gx <= cx + 1; gx++) {
+        for (let gy = cy - 1; gy <= cy + 1; gy++) {
+          const cell = grid.get(gx + ',' + gy);
+          if (cell) for (let o of cell) neighbours.push(o);
+        }
+      }
+      boid.flock(neighbours, frameCount);
       boid.update();
       boid.draw(ctx);
     }
@@ -325,6 +370,8 @@
     animate();
 
     window.addEventListener('resize', handleResize);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseleave', handleMouseLeave);
   });
 
   onDestroy(() => {
@@ -332,7 +379,17 @@
       cancelAnimationFrame(animationId);
     }
     window.removeEventListener('resize', handleResize);
+    window.removeEventListener('mousemove', handleMouseMove);
+    window.removeEventListener('mouseleave', handleMouseLeave);
   });
+
+  function handleMouseMove(e) {
+    mouse = { x: e.clientX, y: e.clientY };
+  }
+
+  function handleMouseLeave() {
+    mouse = null;
+  }
 
   function handleResize() {
     resizeCanvas();
@@ -340,7 +397,7 @@
   }
 </script>
 
-<canvas 
+<canvas
   bind:this={canvas}
   style="
     position: fixed;
@@ -352,7 +409,7 @@
     pointer-events: none;
     opacity: {opacity};
   "
-/>
+></canvas>
 
 <style>
   /* Canvas styles are inline for better prop control */
