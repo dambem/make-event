@@ -1,5 +1,5 @@
 <script>
-  import TicketCard from './TicketCard.svelte';
+  import TicketCard, { defaultEventDateShort } from './TicketCard.svelte';
 
   export let visible = false;
 
@@ -21,7 +21,7 @@
 <svelte:window on:keydown={handleKeydown} />
 
 {#if expanded}
-  <div class="drawer-backdrop" on:click={close} aria-hidden="true" />
+  <div class="drawer-backdrop" on:click={close} aria-hidden="true"></div>
 {/if}
 
 <div class="drawer" class:visible class:expanded>
@@ -31,7 +31,7 @@
       <span></span>
       <span></span>
     </span>
-    <span class="drawer-meta">make~&nbsp;&nbsp;·&nbsp;&nbsp;10 Mar 2026&nbsp;&nbsp;·&nbsp;&nbsp;Free</span>
+    <span class="drawer-meta">make~&nbsp;&nbsp;·&nbsp;&nbsp;{defaultEventDateShort}&nbsp;&nbsp;·&nbsp;&nbsp;Free</span>
     <span class="drawer-cta" class:flipped={expanded}>get tickets ↑</span>
   </button>
 

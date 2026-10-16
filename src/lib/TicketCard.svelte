@@ -1,10 +1,19 @@
+<script context="module">
+  export const defaultEventDate = "Tuesday 10th November 2026";
+  // e.g. "Tuesday 10th November 2026" -> "10 Nov 2026"
+  export const defaultEventDateShort = defaultEventDate
+    .replace(/^\w+\s+/, '')
+    .replace(/(\d+)(st|nd|rd|th)/, '$1')
+    .replace(/([A-Za-z]{3})[a-z]*/, '$1');
+</script>
+
 <script>
   import { onMount, onDestroy } from 'svelte';
 
   export let eventTitle = "MAKE~";
-  export let eventDate = "Thurs 26th Novemberc 2026";
+  export let eventDate = defaultEventDate;
   export let eventTime = "5:30 PM – 8:00 PM";
-  export let eventDateTime = "2026-11-26T17:30:00"; // ISO format for countdown
+  export let eventDateTime = "2026-11-10T17:30:00"; // ISO format for countdown
   export let venue = "To Be Announced (Southampton/Winchester)";
     let countdown = { days: 0, hours: 0, minutes: 0, seconds: 0 };
   /**
@@ -150,7 +159,7 @@
   }
 
   .ticket-card {
-    background: rgba(10, 10, 10, 0.7);
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.55) 45%, rgba(0, 0, 0, 0) 100%);
     border: 1px solid var(--border);
     border-radius: 20px;
     padding: 2rem;
