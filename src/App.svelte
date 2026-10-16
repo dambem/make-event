@@ -10,10 +10,10 @@
   import imgAudience from './assets/1758730080993.jpeg'
 
   const customColors = [
-    'rgba(0, 255, 136, 0.4)',
-    'rgba(0, 255, 136, 0.4)',
-    'rgba(139, 92, 246, 0.4)',
-    'rgba(229, 229, 229, 0.3)',
+    'rgba(0, 200, 106, 1)',
+    'rgba(0, 170, 90, 1)',
+    'rgba(30, 215, 130, 0.95)',
+    'rgba(80, 225, 160, 0.9)',
   ];
 
   let isHovered = false;
@@ -38,16 +38,16 @@
 
 <main>
     <Boids 
-    numBoids={500}
-    numBoidsMobile={40}
-    opacity={0.7}
+    numBoids={800}
+    numBoidsMobile={80}
+    opacity={1}
     colors={customColors}
     avoidanceSelector=".boid-repel"
     avoidanceBuffer={50}
     />
   <div id='background'></div>
       <div class="url-display mono">
-        <span on:click={()=>window.location=location} id="url-text">~ Creative Catalyst Tech Talks ~</span>
+        <span role="button" tabindex="0" on:click={()=>window.location=location} on:keydown={(e)=>{ if (e.key === 'Enter' || e.key === ' ') window.location=location; }} id="url-text">~ Creative Catalyst Tech Talks ~</span>
     </div>
     <nav class="nav">
         <a href="#home" class="nav-item">home</a>
@@ -59,7 +59,7 @@
         <a href="#contact" class="nav-item">contact</a>
     </nav>
     <section id="home" class="header">
-        <h1 class="title" class:boid-repel={isHovered} on:mouseover={() => isHovered = true} on:mouseout={() => isHovered = false}>make~</h1>
+        <h1 class="title" class:boid-repel={isHovered} on:mouseenter={() => isHovered = true} on:mouseleave={() => isHovered = false}>make~</h1>
         <p class="subtitle">creative tech flash talks in southampton</p>
     </section>
 
@@ -67,7 +67,8 @@
         <div class="about-inner">
             <div class="content">
                 <h2>What is make~?</h2>
-                <p><strong>make~ is an evening of flash talks about creative technology, tools, ideas, and unfinished projects.</strong> It's made for artists, designers, hackers, programmers, students, tinkerers, writers. Basically, anyone who wants to share something they've made, thought about, or can't stop tinkering with.</p>
+                <p><strong>make~ is an evening of flash talks about creative technology, tools, ideas, and unfinished projects.</strong></p>
+                <p>It's for artists, designers, hackers, programmers, students, tinkerers and writers. Basically, anyone who wants to share something they've made, thought about, or can't stop tinkering with.</p>
                 <p class="interactive-text">6 speakers. 6 minutes each. Then time for drinks, food and idea sharing</p>
             </div>
             <div class="about-ticket">
@@ -79,29 +80,35 @@
     <section id="talks" class="section">
         <div class="content">
             <h2>What kinds of talks?</h2>
-            <ul style="list-style: none; padding-left: 0;">
-                <li class="interactive-text" style="margin: 1rem 0; padding-left: 2rem; position: relative;">
-                    <span style="position: absolute; left: 0; color: var(--primary);">*</span>
-                    a generative music experiment made with code
+            <p><em>Previously we've had...</em></p>
+            <ul class="talk-list">
+                <li class="interactive-text talk-item">
+                    <span class="talk-star" style="color: #ff6b35;">*</span>
+                    generative music made with code
                 </li>
-                <li class="interactive-text" style="margin: 1rem 0; padding-left: 2rem; position: relative;">
-                    <span style="position: absolute; left: 0; color: var(--secondary);">*</span>
+                <li class="interactive-text talk-item">
+                    <span class="talk-star" style="color: #ff4d8d;">*</span>
                     an obsession with old keyboards
                 </li>
-                <li class="interactive-text" style="margin: 1rem 0; padding-left: 2rem; position: relative;">
-                    <span style="position: absolute; left: 0; color: var(--accent);">*</span>
-                    a philosophy of open tools
-                </li>
-                <li class="interactive-text" style="margin: 1rem 0; padding-left: 2rem; position: relative;">
-                    <span style="position: absolute; left: 0; color: var(--primary);">*</span>
-                    a speculative design concept
-                </li>
-                <li class="interactive-text" style="margin: 1rem 0; padding-left: 2rem; position: relative;">
-                    <span style="position: absolute; left: 0; color: var(--secondary);">*</span>
+                <li class="interactive-text talk-item">
+                    <span class="talk-star" style="color: #facc15;">*</span>
                     a failed side project with lessons that stuck
                 </li>
+                <li class="interactive-text talk-item">
+                    <span class="talk-star" style="color: #8b5cf6;">*</span>
+                    a philosophy of open tools
+                </li>
+                <li class="interactive-text talk-item">
+                    <span class="talk-star" style="color: #38bdf8;">*</span>
+                    a speculative design concept
+                </li>
+                <li class="interactive-text talk-item">
+                    <span class="talk-star" style="color: #fb923c;">*</span>
+                    things someone built just to see if they could
+                </li>
             </ul>
-            <p><em>We welcome the creative, the short lessons in tech. You don't need a polished pitch deck. You just need an idea to share.</em></p>
+            <p class="talks-note"><em>You don't need a polished pitch deck, in fact we'd rather it wasn't a pitch deck at all.</em></p>
+            <p><em>You just need an idea to share. Even if it's too weird, especially if it's 'too weird'.</em></p>
         </div>
     </section>
 
@@ -154,7 +161,7 @@
             </div>
 
             <div class="event-thanks">
-                <p>Thank you to Barclays Eagle Labs and Southampton City Council — and specifically Luke Hampson and Catherine Anderson — for the space, the pizzas, and the drinks. And to Fred Bassett (FRSA) for pulling everyone together, and to Sian Campbell, Chris Cloke Browne PhD FRSA, Paul Woodford, Natalie Haigh, Kane Watkinson and everyone else who made the evening run.</p>
+                <p>Thank you to Barclays Eagle Labs and Southampton City Council — and specifically Luke Hampson and Catherine Anderson — for the space, the pizzas, and the drinks. And to Fred Bassett FRSA for pulling everyone together, and to Sian Campbell, Chris Cloke Browne PhD FRSA, Paul Woodford, Natalie Haigh, Kane Watkinson and everyone else who made the evening run.</p>
             </div>
         </div>
     </section>
@@ -215,15 +222,9 @@
         <div class="content">
             <h2>Contact</h2>
             <p>Want to sponsor, provide drinks or just have some questions, email us!</p>
-            <a> Damian Bemben | Organiser | damianbemben@geochip.uk</a>
+            <a class="contact-link" href="mailto:damianbemben@geochip.uk"> Damian Bemben | damianbemben@geochip.uk</a>
         </div>
     </section>
 
   <BottomTicketDrawer visible={showDrawer} />
 </main>
-
-<style>
-      .class-on-hover {
-    color: red;
-  }
-</style>

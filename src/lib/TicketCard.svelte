@@ -159,7 +159,7 @@
   }
 
   .ticket-card {
-    background: rgba(10, 10, 10, 0.7);
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.55) 45%, rgba(0, 0, 0, 0) 100%);
     border: 1px solid var(--border);
     border-radius: 20px;
     padding: 2rem;

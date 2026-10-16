@@ -21,7 +21,7 @@
 <svelte:window on:keydown={handleKeydown} />
 
 {#if expanded}
-  <div class="drawer-backdrop" on:click={close} aria-hidden="true" />
+  <div class="drawer-backdrop" on:click={close} aria-hidden="true"></div>
 {/if}
 
 <div class="drawer" class:visible class:expanded>
