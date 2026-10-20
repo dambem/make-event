@@ -179,7 +179,7 @@
             <a class="contact-link" href="mailto:damianbemben@geochip.uk"> Damian Bemben | damianbemben@geochip.uk</a>
             <br>
             <br>
-            <a class="contact-link" href="mailto:damianbemben@geochip.uk"> Tam Appleyard | appleyard@tuta.io</a>
+            <a class="contact-link" href="mailto:damianbemben@geochip.uk"> Tom Appleyard | appleyard@tuta.io</a>
         </div>
     </section>
 
