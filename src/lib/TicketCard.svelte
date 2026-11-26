@@ -1,4 +1,5 @@
 <script context="module">
+  export const defaultTicketUrl = "https://luma.com/qyimx88z";
   export const defaultEventDate = "Tuesday 10th November 2026";
   // e.g. "Tuesday 10th November 2026" -> "10 Nov 2026"
   export const defaultEventDateShort = defaultEventDate
@@ -10,7 +11,7 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
 
-  export let eventTitle = "MAKE~";
+  export let eventTitle = "make~";
   export let eventDate = defaultEventDate;
   export let eventTime = "5:30 PM – 8:00 PM";
   export let eventDateTime = "2026-11-10T17:30:00"; // ISO format for countdown
@@ -24,7 +25,7 @@
   export let location = "To Be Announced";
   export let format = "6 × 6min talks";
   export let price = "Free";
-  export let eventbriteUrl = "https://luma.com/qyimx88z";
+  export let eventbriteUrl = defaultTicketUrl;
   export let perks = [
     "6 creative tech flash talks",
     "Networking with local makers & creatives", 
@@ -209,7 +210,6 @@
     margin-bottom: 0.25rem;
     font-weight: 500;
     letter-spacing: 0.02em;
-    text-transform: uppercase;
   }
 
   .ticket-date {
